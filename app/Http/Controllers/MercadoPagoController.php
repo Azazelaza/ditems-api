@@ -1,0 +1,210 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+use MercadoPago\Item;
+use MercadoPago\Preference;
+use MercadoPago\SDK;
+
+class MercadoPagoController extends Controller
+{
+    //USERID 1395469848
+    //NUM APP 4448855768717681
+    //public-key TEST-9f69ef54-f8aa-4ca2-b12d-dd823f1766ff
+    function create(Request $request)
+    {
+        SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
+        $preference = new Preference();
+
+        $order = Order::find($request->id);
+        
+        if ($order->status != Order::CAPTURA) {
+            return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
+        }
+
+        $order->status = Order::PENDIENTE_PAGO;
+        $order->save();
+
+        foreach ($request->products as $product) {
+            $item = new Item();
+            $item->title = $product['name'];
+            $item->quantity = $product['quantity'];
+            $item->unit_price = $product['price'];
+        }
+
+        $fechaHoy               = date('Y-m-d\TH:i:s.vP');
+        $preference->items      = array($item);
+        $preference->back_urls  = [
+            "success" => url('/checkout/complete'),
+            "failure" => url('/checkout/cancelate'),
+            "pending" => url('/checkout/process'),
+        ];
+        $preference->external_reference = $order->id;
+        $preference->date_of_expiration = (date('Y-m-d\TH:i:s.vP', strtotime($fechaHoy.' + 3day')));
+        $preference->save();
+
+
+        return Response::json([
+            'url'   => $preference->sandbox_init_point,
+            'datos' => ['order_id' => $order->id],
+        ], 200);
+    }
+
+    function complete(Request $request)
+    {
+        try{
+    
+            $infoMap        = $request->all();
+
+            $order = Order::find($infoMap['external_reference']);
+            if ($order->status != Order::PENDIENTE_PAGO) {
+                return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
+            }
+            $order->status          = Order::PAGADO;
+            $order->payment_date    = date('Y-m-d H:i:s');
+            $orden->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
+            $orden->payment_id      = $infoMap['payment_id'];
+            $orden->info_mp         = json_encode($infoMap);
+            $order->save();
+            return Response()->json(['success' => true]);
+        }catch(Exception $error){
+            return Response()->json(['success' => false, 'message' => 'Error al completar pago.', 'error' => $error]);
+        }
+    }
+
+
+    function cancelate(Request $request)
+    {
+        try{
+    
+            $infoMap        = $request->all();
+
+            $order = Order::find($infoMap['external_reference']);
+            if ($order->status != Order::PENDIENTE_PAGO) {
+                return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
+            }
+            $order->status          = Order::ORDEN_CANCELADA;
+            $order->cancel_date     = date('Y-m-d H:i:s');
+            $orden->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
+            $orden->payment_id      = $infoMap['payment_id'];
+            $orden->info_mp         = json_encode($infoMap);
+            $order->save();
+            return Response()->json(['success' => true]);
+        }catch(Exception $error){
+            return Response()->json(['success' => false, 'message' => 'Error al cancelar pago.', 'error' => $error]);
+        }
+    }
+
+
+    function process(Request $request)
+    {
+        try{
+    
+            $infoMap        = $request->all();
+
+            $order = Order::find($infoMap['external_reference']);
+            if ($order->status != Order::PENDIENTE_PAGO) {
+                return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
+            }
+            $order->status          = Order::EN_PROCESO;
+            $orden->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
+            $orden->payment_id      = $infoMap['payment_id'];
+            $orden->info_mp         = json_encode($infoMap);
+            $order->save();
+            return Response()->json(['success' => true]);
+        }catch(Exception $error){
+            return Response()->json(['success' => false, 'message' => 'Error al procesar pago.', 'error' => $error]);
+        }
+    }
+    
+
+
+    public function notify(){
+
+        $datos = request()->all();
+        
+        try {
+
+            SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
+          
+            //INIT************ VARIABLES REQUERIDAS **************
+
+            $orden = Order::where('payment_id', $datos['data']['id'])->first();
+            
+            //END************* VARIABLES REQUERIDAS **************
+
+
+            //INIT****** VALIDACIÓN ERRROR Y REDIRECCIÓN *********
+            
+            if (!$orden) {
+                return response()->json([
+                    'status'    => false,
+                    'message'   => 'Error de Notificación, la orden no se encuentra la orden.'
+                ]);
+            }
+            
+            //END******* VALIDACIÓN ERRROR Y REDIRECCIÓN *********
+            
+
+            //INIT****** ACTUALIZACIÓN DE ORDEN Y CARRITO ********
+            
+            $jsonInfoMP                    = json_decode($orden->info_mp);
+            $jsonInfoMP->collection_status = 'approved';
+            $jsonInfoMP->status            = 'approved';
+
+            $orden->status                  = Order::PAGADO;
+            $order->payment_date            = date('Y-m-d H:i:s');
+            $orden->info_mp                 = json_encode($jsonInfoMP);
+            $orden->save();
+
+            //END******* ACTUALIZACIÓN DE ORDEN Y CARRITO ********
+            
+            
+            //INIT**** ENVIAR CORREO ELECTRÓNICO PAGO EXITOSO ****
+            
+            Mail::send('email.pedidoPagoRecibido',['pedido' => $pedido], function($message) use($pedido){
+
+                $message->from(env('MAIL_FROM_ADDRESS'))
+                    ->to($pedido->vcClienteCorreo, $pedido->vcClienteNombre)
+                    ->cc('ordenes@sdindustrial.com.mx')
+                    ->bcc('ngarza@sdindustrial.com.mx')
+                    ->subject('SDI> Pedido Pago Recibido - PWEB'.$pedido->idPedido);
+            });
+            
+            //END***** ENVIAR CORREO ELECTRÓNICO PAGO EXITOSO ****
+        
+            return response()->json([
+                'status'    => true,
+                'message'   => 'Éxito de Notificación'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Error de Notificación',
+                'error' => $e
+            ]);
+        }
+        
+    }
+
+
+    static function convertirTipoPago($tipoPago){
+        $arrayTipoPago = [
+            'credit_card'       => 'Tarjeta de crédito',
+            'debit_card'        => 'Tarjeta de débito',
+            'bank_transfer'     => 'Transferencia',
+            'atm'               => 'Cajero',
+            'ticket'            => 'Efectivo',
+            'available_money'   => 'Moneda mercado pago',
+
+        ];
+        return $arrayTipoPago[$tipoPago] ?? $tipoPago;        
+    }
+
+
+
+
+}
