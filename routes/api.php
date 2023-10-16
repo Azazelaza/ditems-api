@@ -34,6 +34,7 @@ Route::post('admin/register', [AuthAdminController::class, 'register']);
 Route::get('/page/{id}', [ContentPageController::class, 'show']);
 Route::get('/products/company/{id}', [ProductController::class, 'showByCompany']);
 Route::get('/membership/company/{id}', [MembershipController::class, 'showByCompany']);
+Route::post('/ticket', [TicketController::class, 'store']);
 
 Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
     Route::prefix('userAdmin')->group(function () {
@@ -79,9 +80,9 @@ Route::group(['middleware' => ['auth:user', 'scopes:user']], function () {
     Route::get('/checkout/complete', [MercadoPagoController::class, 'complete']);
     Route::get('/checkout/cancelate', [MercadoPagoController::class, 'cancelate']);
     Route::get('/checkout/process', [MercadoPagoController::class, 'process']);
-    Route::apiResource('/ticket', TicketController::class);
+    /* Route::apiResource('/ticket', TicketController::class);
     Route::get('/ticket/user/{id}', [TicketController::class, 'showByUser']);
-    Route::get('/ticket/company/{id}', [TicketController::class, 'showByCompany']);
+    Route::get('/ticket/company/{id}', [TicketController::class, 'showByCompany']); */
     Route::get('/addressInvoice/user/{id}', [AddressInvoiceController::class, 'showByUser']);
     Route::post('/addressInvoice/uploadTaxCertificate', [AddressInvoiceController::class, 'uploadTaxCertificate']);
     Route::get('/addressInvoice/downloadTaxCertificate/{id}', [AddressInvoiceController::class, 'downloadTaxCertificate']);
