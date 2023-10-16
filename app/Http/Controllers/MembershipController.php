@@ -40,10 +40,6 @@ class MembershipController extends Controller
     function showByCompany($id)
     {
         try {
-            if ($this->validateAdmin()) {
-                return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
-            };
-
             $memberships = Membership::company($id)->get();
             return Response()->json(['success' => true, 'data' => $memberships]);
         } catch (Exception $error) {
