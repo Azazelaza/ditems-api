@@ -63,6 +63,7 @@ class ProductController extends Controller
             $product->subtitle      = $request->subtitle;
             $product->description   = $request->description;
             $product->price         = $request->price;
+            $product->image         = $request->image;
             $product->company_id    = $request->company_id;
             $product->isActive      = $request->isActive;
             $product->save();
