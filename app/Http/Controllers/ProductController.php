@@ -46,7 +46,7 @@ class ProductController extends Controller
     function store(Request $request)
     {
         try{
-            $product = Product::create($request->all());
+            Product::create($request->all());
             return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
         }catch(Exception $error){
             return Response()->json(['success' => false, 'message' => 'Error al guardar.', 'error' => $error]);

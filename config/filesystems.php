@@ -29,7 +29,6 @@ return [
     */
 
     'disks' => [
-
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
@@ -39,11 +38,10 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
-
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -57,23 +55,16 @@ return [
         ],
 
         'uploadAddressTaxCertificate' => [
-            'driver'=> 'local',
+            'driver' => 'local',
             'root'  => storage_path('app/users/address_invoices/tax_certificate'),
             'throw' => false,
         ],
 
         'uploadInvoiceTaxCertificate' => [
-            'driver'=> 'local',
+            'driver' => 'local',
             'root'  => storage_path('app/users/invoices/tax_certificate'),
             'throw' => false,
         ],
-
-        'uploadImageProduct' => [
-            'driver'=> 'local',
-            'root'  => storage_path('app/product'),
-            'throw' => false,
-        ],
-        
     ],
 
     /*

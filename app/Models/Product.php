@@ -16,6 +16,7 @@ class Product extends Model
         'description',
         'price',
         'company_id',
+        'image',
         'isActive',
     ];
     protected $appends = [
@@ -31,14 +32,11 @@ class Product extends Model
         $q->where('company_id', $id);
     }
     public function getPrincipalImageAttribute()
-    {   
-        return storage_path("/product/{$this->image}");
+    {
+        return $this->image;
     }
     public function getGalleryAttribute()
     {
-        $dir1       = storage_path("app/product/{$this->id}/*.{jpg,gif,png}");
-        $arrayURL   = glob($dir1, GLOB_BRACE);
-        return $arrayURL;
+        return $this->image;
     }
-
 }

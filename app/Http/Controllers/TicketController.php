@@ -60,13 +60,21 @@ class TicketController extends Controller
         Ticket::create($request->all());
         return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
     }
+    public function updateStatus(Request $request, $Ticket)
+    {
+        try {
+            $ticket = Ticket::find($Ticket);
+            $ticket->status = $request->status;
+            $ticket->save();
+            return Response()->json(['success' => true, 'message' => 'Se actualizó correctamente.']);
+        } catch (Exception $error) {
+            return Response()->json(['success' => false, 'message' => 'Error al actualizar.', 'error' => $error]);
+        }
+    }
     public function update(Request $request, $Ticket)
     {
         try {
             $ticket = Ticket::find($Ticket);
-            if (!$ticket) {
-                return Response()->json(['success' => false, 'message' => 'Ticket no encontrado..', 'error' => '']);
-            }
             $ticket->incident           = $request->incident;
             $ticket->description        = $request->description;
             $ticket->request_user_id    = $request->request_user_id;
