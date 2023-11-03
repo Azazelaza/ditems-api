@@ -21,9 +21,11 @@ class User extends Authenticatable
         'name',
         'last_name',
         'email',
+        'gender',
         'password',
         'username',
         'phone',
+        'birthday',
         'isActive',
     ];
 
@@ -35,6 +37,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $with = [
+        'address',
+        'billing'
     ];
 
     /**
@@ -50,5 +57,14 @@ class User extends Authenticatable
     public function scopeActive($q)
     {
         $q->where('isActive', 1);
+    }
+
+    public function address()
+    {
+        return $this->hasMany(AddressShipping::class);
+    }
+    public function billing()
+    {
+        return $this->hasMany(AddressInvoice::class);
     }
 }

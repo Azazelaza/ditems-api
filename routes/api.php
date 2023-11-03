@@ -19,6 +19,7 @@ use App\Http\Controllers\RoleForAdminController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('user/login', [AuthUserController::class, 'login']);
 Route::post('user/register', [AuthUserController::class, 'register']);
+Route::post('user/check', [AuthUserController::class, 'renewToken']);
 Route::post('admin/login', [AuthAdminController::class, 'login']);
 Route::post('admin/check', [AuthAdminController::class, 'renewToken']);
 Route::post('admin/register', [AuthAdminController::class, 'register']);
@@ -36,6 +38,8 @@ Route::get('/products/company/{id}', [ProductController::class, 'showByCompany']
 Route::get('/membership/company/{id}', [MembershipController::class, 'showByCompany']);
 Route::post('/ticket', [TicketController::class, 'store']);
 Route::post('/uploadImage', [ContentPageController::class, 'uploadImage']);
+Route::get('product/{id}', [ProductController::class, 'show']);
+Route::get('/states', [StateController::class, 'showAll']);
 
 Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
     Route::prefix('userAdmin')->group(function () {
@@ -46,7 +50,6 @@ Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
         Route::apiResource('/company', CompanyController::class);
         Route::apiResource('/roleforadmin', RoleForAdminController::class);
         Route::apiResource('/country', CountryController::class);
-        Route::apiResource('/state', StateController::class);
         Route::apiResource('/city', CityController::class);
         Route::apiResource('/invoice', InvoicesController::class);
         Route::apiResource('/role', RoleController::class);
@@ -58,8 +61,6 @@ Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
         Route::get('/roleforadmin/admin/{id}', [RoleForAdminController::class, 'showByAdmin']);
         Route::get('/roleforadmin/rol/{id}', [RoleForAdminController::class, 'showByRol']);
         Route::get('/invoice/downloadTaxCertificate/{id}', [InvoicesController::class, 'downloadTaxCertificate']);
-        Route::get('/state/country/{id}', [ProductController::class, 'showByCountry']);
-        Route::get('/city/state/{id}', [ProductController::class, 'showByState']);
         Route::post('/order/sendPending', [OrderController::class, 'sendPending']);
         Route::post('/order/sendCancel', [OrderController::class, 'sendCancel']);
         Route::post('/order/sendPaid', [OrderController::class, 'sendPaid']);

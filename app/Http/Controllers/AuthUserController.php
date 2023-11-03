@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -28,7 +30,12 @@ class AuthUserController extends Controller
             'birthday' => 'required|string',
             'gender' => 'required|string',
         ]);
-        $request->merge(['isActive' => 1, 'password' => Hash::make($request->password)]);
+        $request->merge([
+            'username' => $request->name,
+            'isActive' => 1,
+            'password' => Hash::make($request->password),
+            'birthday' => Carbon::parse($request->birthday)->format('Y-m-d'),
+        ]);
         $user = User::create($request->toArray());
         config(['auth.guards.user.driver' => 'session']);
         Auth::guard('user')->attempt(['email' => $request->email, 'password' => $request->password]);
@@ -36,9 +43,9 @@ class AuthUserController extends Controller
         $user->token = $token;
         $user->remember_token = Str::random(60);
         $user->save();
-        return response()->json(['token' => $token], 200);
+        return response()->json(['success' => true, 'user' => $user], 200);
     }
- 
+
     /**
      * Handles Login Request
      *
@@ -52,12 +59,12 @@ class AuthUserController extends Controller
             'password' => 'required|string',
         ]);
         config(['auth.guards.user.driver' => 'session']);
-        if ( Auth::guard('user')->attempt(['email' => $request->email, 'password' => $request->password]) ){
+        if (Auth::guard('user')->attempt(['email' => $request->email, 'password' => $request->password])) {
             $token = Auth::guard('user')->user()->createToken('User', ['user'])->accessToken;
             $user = User::find(Auth::guard('user')->user()->id);
             $user->token = $token;
             $user->save();
-            return response()->json(['token' => $token, 'user' => $user['password']], 200);
+            return response()->json(['success' => true, 'token' => $token, 'user' => $user], 200);
         } else {
             return response()->json(['error' => 'No Autorizado'], 401);
         }
@@ -73,7 +80,7 @@ class AuthUserController extends Controller
         Auth::guard('user')->user()->token()->revoke();
         return response()->json(['message' => "Logout"], 200);
     }
- 
+
     /**
      * Handles Reset Password
      *
@@ -86,7 +93,7 @@ class AuthUserController extends Controller
             'remember_token' => 'required|string',
             'password' => 'required|string'
         ]);
-        if(User::where('remember_token', $request->remember_token)->exists()){
+        if (User::where('remember_token', $request->remember_token)->exists()) {
             $user = User::where('remember_token', $request->remember_token)->first();
             $user->password = bcrypt($request->password);
             $user->save();
@@ -95,7 +102,7 @@ class AuthUserController extends Controller
             $user->token = $token;
             $user->save();
             return response()->json(['token' => $token], 200);
-        }else{
+        } else {
             return response()->json(['message' => "No Autorizado"], 200);
         }
     }
@@ -107,21 +114,7 @@ class AuthUserController extends Controller
      */
     public function renewToken(Request $request)
     {
-        Validator::make($request->all(), [
-            'remember_token' => 'required|string'
-        ]);
-        if(User::where('remember_token', $request['remember_token'])->exists()){
-            $user = User::where('remember_token', $request['remember_token'])->first();
-            config(['auth.guards.user.driver' => 'session']);
-            Auth::guard('user')->attempt(['email' => $user->email, 'password' => $user->password]);
-            Auth::guard('user')->user()->token()->revoke();
-            $token = Auth::guard('user')->user()->createToken('User', ['user'])->accessToken;
-            $user = User::find(Auth::guard('user')->user()->id);
-            $user->token = $token;
-            $user->save();
-            return response()->json(['token' => $token, 'user' => $user], 200);
-        }else{
-            return response()->json(['message' => "No Autorizado"], 200);
-        }
+        $user = User::where('token', $request->remember_token)->first();
+        return response()->json(['user' => $user, 'token' => $user->token, 'success' => true], 200);
     }
 }

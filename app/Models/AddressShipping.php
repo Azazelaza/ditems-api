@@ -11,7 +11,7 @@ class AddressShipping extends Model
 
     protected $fillable = [
         'state_id',
-        'city_id',
+        'city',
         'country_id',
         'street',
         'suburb',
@@ -23,8 +23,16 @@ class AddressShipping extends Model
         'main',
     ];
 
+    protected $with = [
+        'state'
+    ];
+
     public function scopeUser($q, $id)
     {
         $q->where('user_id', $id);
+    }
+    public function state()
+    {
+        return $this->hasOne(State::class, 'id', 'state_id');
     }
 }

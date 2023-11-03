@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string('number_outside');
             $table->string('number_inside')->nullable();
             $table->string('city');
-            $table->string('reference');
+            $table->string('reference')->nullable();
             $table->string('notes');
             $table->foreignId('user_id');
-            $table->boolean('main');
+            $table->boolean('main')->default(0);
             $table->timestamps();
         });
     }

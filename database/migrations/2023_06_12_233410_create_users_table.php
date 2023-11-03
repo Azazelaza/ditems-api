@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            //?TODO: USERNAME YA NO SE UTILIZARA SE INICIARA CON EMAIL
-            $table->string('username')->unique();
+            $table->string('username');
             $table->string('name');
             $table->string('last_name');
             $table->string('phone');

@@ -15,14 +15,14 @@ class StateController extends Controller
      */
     public function index()
     {
-        try{
-            if ( $this->validateAdmin() ) {
+        try {
+            if ($this->validateAdmin()) {
                 return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
             };
-            
+
             $states = State::paginate(15);
             return Response()->json(['success' => true, 'data' => $states]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
@@ -32,14 +32,14 @@ class StateController extends Controller
      */
     public function store(Request $request)
     {
-        try{
-            if ( $this->validateAdmin() ) {
+        try {
+            if ($this->validateAdmin()) {
                 return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
             };
-            
+
             $state = State::create($request->all());
             return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al guardar.', 'error' => $error]);
         }
     }
@@ -47,16 +47,12 @@ class StateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function showAll()
     {
-        try{
-            if ( $this->validateAdmin() ) {
-                return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
-            };
-            
-            $state = State::find($id);
+        try {
+            $state = State::all();
             return Response()->json(['success' => true, 'data' => $state]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
@@ -66,14 +62,14 @@ class StateController extends Controller
      */
     function showByCountry($id)
     {
-        try{
-            if ( $this->validateAdmin() ) {
+        try {
+            if ($this->validateAdmin()) {
                 return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
             };
-            
+
             $states = State::country($id)->get();
             return Response()->json(['success' => true, 'data' => $states]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
@@ -83,11 +79,11 @@ class StateController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try{
-            if ( $this->validateAdmin() ) {
+        try {
+            if ($this->validateAdmin()) {
                 return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
             };
-            
+
             $state = State::find($id);
             if (!$state) {
                 return Response()->json(['success' => false, 'message' => 'Estado no encontrado..', 'error' => '']);
@@ -96,7 +92,7 @@ class StateController extends Controller
             $state->country_id  = $request->country_id;
             $state->save();
             return Response()->json(['success' => true, 'message' => 'Se actualizó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al actualizar.', 'error' => $error]);
         }
     }
@@ -106,26 +102,24 @@ class StateController extends Controller
      */
     public function destroy(State $state)
     {
-        try{
-            if ( $this->validateAdmin() ) {
+        try {
+            if ($this->validateAdmin()) {
                 return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
             };
-            
+
             $state->delete();
             return Response()->json(['success' => true, 'message' => 'Se eliminó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al eliminar.', 'error' => $error]);
         }
     }
 
-    public static function validateAdmin(){
+    public static function validateAdmin()
+    {
 
-        if ( Auth::guard('admin')->user()->id != 1 ) {
+        if (Auth::guard('admin')->user()->id != 1) {
             return true;
         };
         return false;
     }
-
-
-
 }

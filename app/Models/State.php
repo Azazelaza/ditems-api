@@ -18,4 +18,6 @@ class State extends Model
     {
         $q->where('country_id', $id);
     }
+
+    
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use MercadoPago\Item;
+use MercadoPago\Payer;
+use MercadoPago\Payment;
 use MercadoPago\Preference;
 use MercadoPago\SDK;
 
@@ -16,46 +18,28 @@ class MercadoPagoController extends Controller
     function create(Request $request)
     {
         SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
-        $preference = new Preference();
-
-        $order = Order::find($request->id);
-        
-        if ($order->status != Order::CAPTURA) {
-            return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
-        }
-
-        $order->status = Order::PENDIENTE_PAGO;
-        $order->save();
-
-        foreach ($request->products as $product) {
-            $item = new Item();
-            $item->title = $product['name'];
-            $item->quantity = $product['quantity'];
-            $item->unit_price = $product['price'];
-        }
-
-        $fechaHoy               = date('Y-m-d\TH:i:s.vP');
-        $preference->items      = array($item);
-        $preference->back_urls  = [
-            "success" => url('/checkout/complete'),
-            "failure" => url('/checkout/cancelate'),
-            "pending" => url('/checkout/process'),
-        ];
-        $preference->external_reference = $order->id;
-        $preference->date_of_expiration = (date('Y-m-d\TH:i:s.vP', strtotime($fechaHoy.' + 3day')));
-        $preference->save();
-
-
-        return Response::json([
-            'url'   => $preference->sandbox_init_point,
-            'datos' => ['order_id' => $order->id],
-        ], 200);
+        $payment = new Payment();
+        $payment->transaction_amount = $request->transaction_amount;
+        $payment->token = $request->token;
+        $payment->installments = $request->installments;
+        $payment->payment_method_id = $request->payment_method_id;
+        $payment->issuer_id = $request->issuer_id;
+        $payer = new Payer();
+        $payer->email = $request->payer['email'];
+        $payment->payer = $payer;
+        $payment->save();
+        $response = array(
+            'status' => $payment->status,
+            'status_detail' => $payment->status_detail,
+            'id' => $payment->id
+        );
+        return Response()->json(['success' => true, 'data' => $response]);
     }
 
     function complete(Request $request)
     {
-        try{
-    
+        try {
+
             $infoMap        = $request->all();
 
             $order = Order::find($infoMap['external_reference']);
@@ -69,7 +53,7 @@ class MercadoPagoController extends Controller
             $orden->info_mp         = json_encode($infoMap);
             $order->save();
             return Response()->json(['success' => true]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al completar pago.', 'error' => $error]);
         }
     }
@@ -77,8 +61,8 @@ class MercadoPagoController extends Controller
 
     function cancelate(Request $request)
     {
-        try{
-    
+        try {
+
             $infoMap        = $request->all();
 
             $order = Order::find($infoMap['external_reference']);
@@ -92,7 +76,7 @@ class MercadoPagoController extends Controller
             $orden->info_mp         = json_encode($infoMap);
             $order->save();
             return Response()->json(['success' => true]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al cancelar pago.', 'error' => $error]);
         }
     }
@@ -100,8 +84,8 @@ class MercadoPagoController extends Controller
 
     function process(Request $request)
     {
-        try{
-    
+        try {
+
             $infoMap        = $request->all();
 
             $order = Order::find($infoMap['external_reference']);
@@ -114,42 +98,43 @@ class MercadoPagoController extends Controller
             $orden->info_mp         = json_encode($infoMap);
             $order->save();
             return Response()->json(['success' => true]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al procesar pago.', 'error' => $error]);
         }
     }
-    
 
 
-    public function notify(){
+
+    public function notify()
+    {
 
         $datos = request()->all();
-        
+
         try {
 
             SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
-          
+
             //INIT************ VARIABLES REQUERIDAS **************
 
             $orden = Order::where('payment_id', $datos['data']['id'])->first();
-            
+
             //END************* VARIABLES REQUERIDAS **************
 
 
             //INIT****** VALIDACIÓN ERRROR Y REDIRECCIÓN *********
-            
+
             if (!$orden) {
                 return response()->json([
                     'status'    => false,
                     'message'   => 'Error de Notificación, la orden no se encuentra la orden.'
                 ]);
             }
-            
+
             //END******* VALIDACIÓN ERRROR Y REDIRECCIÓN *********
-            
+
 
             //INIT****** ACTUALIZACIÓN DE ORDEN Y CARRITO ********
-            
+
             $jsonInfoMP                    = json_decode($orden->info_mp);
             $jsonInfoMP->collection_status = 'approved';
             $jsonInfoMP->status            = 'approved';
@@ -160,26 +145,25 @@ class MercadoPagoController extends Controller
             $orden->save();
 
             //END******* ACTUALIZACIÓN DE ORDEN Y CARRITO ********
-            
-            
+
+
             //INIT**** ENVIAR CORREO ELECTRÓNICO PAGO EXITOSO ****
-            
-            Mail::send('email.pedidoPagoRecibido',['pedido' => $pedido], function($message) use($pedido){
+
+            Mail::send('email.pedidoPagoRecibido', ['pedido' => $pedido], function ($message) use ($pedido) {
 
                 $message->from(env('MAIL_FROM_ADDRESS'))
                     ->to($pedido->vcClienteCorreo, $pedido->vcClienteNombre)
                     ->cc('ordenes@sdindustrial.com.mx')
                     ->bcc('ngarza@sdindustrial.com.mx')
-                    ->subject('SDI> Pedido Pago Recibido - PWEB'.$pedido->idPedido);
+                    ->subject('SDI> Pedido Pago Recibido - PWEB' . $pedido->idPedido);
             });
-            
+
             //END***** ENVIAR CORREO ELECTRÓNICO PAGO EXITOSO ****
-        
+
             return response()->json([
                 'status'    => true,
                 'message'   => 'Éxito de Notificación'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status'    => false,
@@ -187,11 +171,11 @@ class MercadoPagoController extends Controller
                 'error' => $e
             ]);
         }
-        
     }
 
 
-    static function convertirTipoPago($tipoPago){
+    static function convertirTipoPago($tipoPago)
+    {
         $arrayTipoPago = [
             'credit_card'       => 'Tarjeta de crédito',
             'debit_card'        => 'Tarjeta de débito',
@@ -201,10 +185,6 @@ class MercadoPagoController extends Controller
             'available_money'   => 'Moneda mercado pago',
 
         ];
-        return $arrayTipoPago[$tipoPago] ?? $tipoPago;        
+        return $arrayTipoPago[$tipoPago] ?? $tipoPago;
     }
-
-
-
-
 }

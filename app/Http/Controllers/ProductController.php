@@ -28,7 +28,7 @@ class ProductController extends Controller
     function show($id)
     {
         try{
-            $product = Product::find($id);
+            $product = Product::findOrFail($id);
             return Response()->json(['success' => true, 'data' => $product]);
         }catch(Exception $error){
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
