@@ -46,7 +46,7 @@ class MercadoPagoController extends Controller
             'user_id' => $request->user()->id,
             'payment_date' => date('Y-m-d H:i:s'),
             'payment_type' => "Mercado pago",
-            'info_mp' => json_encode($response),
+            'info_mp' => json_encode($payment),
         ]);
 
         return Response()->json(['success' => true, 'data' => $order, 'payment' => [$response, $payment]]);
