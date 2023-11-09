@@ -49,7 +49,7 @@ class MercadoPagoController extends Controller
             'info_mp' => json_encode($response),
         ]);
 
-        return Response()->json(['success' => true, 'data' => $order, 'payment' => $response]);
+        return Response()->json(['success' => true, 'data' => $order, 'payment' => [$response, $payment]]);
     }
 
     function complete(Request $request)
