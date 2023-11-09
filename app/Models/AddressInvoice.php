@@ -20,6 +20,7 @@ class AddressInvoice extends Model
         'number_outside',
         'number_inside',
         'user_id',
+        'city',
     ];
 
     public function scopeUser($q, $id)

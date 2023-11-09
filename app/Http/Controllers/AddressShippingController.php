@@ -10,19 +10,20 @@ class AddressShippingController extends Controller
 {
     public function index(Request $request)
     {
-        try{
-            $shipping = AddressShipping::paginate(15);
+        try {
+            $user_id = $request->user()->id;
+            $shipping = AddressShipping::where(["user_id" => $user_id])->get();
             return Response()->json(['success' => true, 'data' => $shipping]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
     function show($id)
     {
-        try{
+        try {
             $shipping = AddressShipping::find($id);
             return Response()->json(['success' => true, 'data' => $shipping]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
@@ -32,26 +33,26 @@ class AddressShippingController extends Controller
      */
     function showByUser($id)
     {
-        try{
+        try {
             $shippings = AddressShipping::user($id)->get();
             return Response()->json(['success' => true, 'data' => $Shippings]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
 
     function store(Request $request)
     {
-        try{
+        try {
             $shipping = AddressShipping::create($request->all());
             return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al guardar.', 'error' => $error]);
         }
     }
     public function update(Request $request, $idAddressShipping)
     {
-        try{
+        try {
             $shipping = AddressShipping::find($idAddressShipping);
             if (!$shipping) {
                 return Response()->json(['success' => false, 'message' => 'Dirección de Envío no encontrada..', 'error' => '']);
@@ -68,16 +69,17 @@ class AddressShippingController extends Controller
             $shipping->city              = $request->city;
             $shipping->save();
             return Response()->json(['success' => true, 'message' => 'Se actualizó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al actualizar.', 'error' => $error]);
         }
     }
-    function destroy(AddressShipping $shipping)
+    function destroy($idAddressShipping)
     {
-        try{
+        try {
+            $shipping = AddressShipping::find($idAddressShipping);
             $shipping->delete();
             return Response()->json(['success' => true, 'message' => 'Se eliminó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al eliminar.', 'error' => $error]);
         }
     }

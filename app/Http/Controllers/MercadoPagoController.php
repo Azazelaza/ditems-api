@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use MercadoPago\Item;
@@ -18,22 +19,29 @@ class MercadoPagoController extends Controller
     function create(Request $request)
     {
         SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
-        $payment = new Payment();
-        $payment->transaction_amount = $request->transaction_amount;
-        $payment->token = $request->token;
-        $payment->installments = $request->installments;
-        $payment->payment_method_id = $request->payment_method_id;
-        $payment->issuer_id = $request->issuer_id;
-        $payer = new Payer();
-        $payer->email = $request->payer['email'];
-        $payment->payer = $payer;
-        $payment->save();
-        $response = array(
-            'status' => $payment->status,
-            'status_detail' => $payment->status_detail,
-            'id' => $payment->id
-        );
-        return Response()->json(['success' => true, 'data' => $response]);
+        $transaction = $request->transaction;
+
+        if ($request->transaction) {
+            $payment = new Payment();
+            $payment->transaction_amount = $transaction->transaction_amount;
+            $payment->token = $transaction->token;
+            $payment->installments = $transaction->installments;
+            $payment->payment_method_id = $transaction->payment_method_id;
+            $payment->issuer_id = $transaction->issuer_id;
+            $payer = new Payer();
+            $payer->email = $transaction->payer['email'];
+            $payment->payer = $payer;
+            $payment->save();
+            $response = array(
+                'status' => $payment->status,
+                'status_detail' => $payment->status_detail,
+                'id' => $payment->id
+            );
+        }
+
+        $order = Order::create($request->order);
+
+        return Response()->json(['success' => true, 'data' => $order ,'payment' => $response]);
     }
 
     function complete(Request $request)

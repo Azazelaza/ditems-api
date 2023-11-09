@@ -89,22 +89,11 @@ class AddressInvoiceController extends Controller
      */
     function uploadTaxCertificate(Request $request)
     {
-        try{
-            $address = AddressInvoice::find(($request->all()['id']));
-            $uuidDocumento      = Uuid::uuid4();
-            $nombreDocumento    = $request->File('tax_certificate')->getClientOriginalName();
-            $extension          = $request->File('tax_certificate')->getClientOriginalExtension();
-            if (Storage::disk('uploadAddressTaxCertificate')->exists("{$address->tax_certificate}")) {
-                Storage::disk('uploadAddressTaxCertificate')->delete("{$address->tax_certificate}");             
-            }
-            Storage::disk('uploadAddressTaxCertificate')->put("/{$uuidDocumento}.{$extension}",File::get($request->File('tax_certificate')));
-            $address->tax_certificate       = "{$uuidDocumento}.{$extension}";
-            $address->name_tax_certificate  = $nombreDocumento;
-            $address->save();
-            return Response()->json(['success' => true]);
-        }catch(Exception $error){
-            return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
-        }
+        $uuidDocumento      = Uuid::uuid4();
+        $extension          = $request->File('tax_certificate')->getClientOriginalExtension();
+        Storage::disk('uploadInvoiceTaxCertificate')->put("/{$uuidDocumento}.{$extension}", File::get($request->File('tax_certificate')));
+
+        return Response()->json(['success' => true, 'data' => "{$uuidDocumento}.{$extension}"]);
     }
 
     /**
