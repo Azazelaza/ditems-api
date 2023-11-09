@@ -5,12 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Response;
-use MercadoPago\Item;
 use MercadoPago\Payer;
 use MercadoPago\Payment;
-use MercadoPago\Preference;
 use MercadoPago\SDK;
 
 class MercadoPagoController extends Controller
