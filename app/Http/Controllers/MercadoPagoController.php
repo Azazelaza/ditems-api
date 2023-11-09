@@ -14,11 +14,11 @@ class MercadoPagoController extends Controller
     {
         MercadoPagoConfig::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->transaction;
-
-        if ($transaction) {
+        $payment = [];
+        /* if ($transaction) {
             $client = new PaymentClient();
-            /* $request_options = new MPRequestOptions();
-            $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]); */
+            $request_options = new MPRequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
             $payment = $client->create([
                 "transaction_amount" => (float) $transaction['transaction_amount'],
@@ -30,7 +30,7 @@ class MercadoPagoController extends Controller
                     "email" => $transaction['payer']['email'],
                 ]
             ]);
-        }
+        } */
 
         $order = Order::create([
             'address_shipping' => json_encode($request->address),
