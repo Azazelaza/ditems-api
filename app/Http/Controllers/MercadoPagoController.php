@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use MercadoPago\Item;
 use MercadoPago\Payer;
@@ -29,7 +31,7 @@ class MercadoPagoController extends Controller
             $payment->payment_method_id = $transaction['payment_method_id'];
             $payment->issuer_id = $transaction['issuer_id'];
             $payer = new Payer();
-            $payer->email = $transaction->['payer']['email'];
+            $payer->email = $transaction['payer']['email'];
             $payment->payer = $payer;
             $payment->save();
             $response = array(
@@ -41,14 +43,14 @@ class MercadoPagoController extends Controller
 
         $order = Order::create([
             'address_shipping' => json_encode($request->address),
-        'products' => json_encode($request->product),
-        'price' => $request->product['price'],
-        'status' => Order::CAPTURA,
-        'user_id' => $request->user()->id,
-        'payment_date' => date('l')
+            'products' => json_encode($request->product),
+            'price' => $request->product['price'],
+            'status' => Order::CAPTURA,
+            'user_id' => $request->user()->id,
+            'payment_date' => date('l')
         ]);
 
-        return Response()->json(['success' => true, 'data' => $order ,'payment' => $response]);
+        return Response()->json(['success' => true, 'data' => $order, 'payment' => $response]);
     }
 
     function complete(Request $request)
@@ -63,9 +65,9 @@ class MercadoPagoController extends Controller
             }
             $order->status          = Order::PAGADO;
             $order->payment_date    = date('Y-m-d H:i:s');
-            $orden->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
-            $orden->payment_id      = $infoMap['payment_id'];
-            $orden->info_mp         = json_encode($infoMap);
+            $order->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
+            $order->payment_id      = $infoMap['payment_id'];
+            $order->info_mp         = json_encode($infoMap);
             $order->save();
             return Response()->json(['success' => true]);
         } catch (Exception $error) {
@@ -86,9 +88,9 @@ class MercadoPagoController extends Controller
             }
             $order->status          = Order::ORDEN_CANCELADA;
             $order->cancel_date     = date('Y-m-d H:i:s');
-            $orden->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
-            $orden->payment_id      = $infoMap['payment_id'];
-            $orden->info_mp         = json_encode($infoMap);
+            $order->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
+            $order->payment_id      = $infoMap['payment_id'];
+            $order->info_mp         = json_encode($infoMap);
             $order->save();
             return Response()->json(['success' => true]);
         } catch (Exception $error) {
@@ -108,9 +110,9 @@ class MercadoPagoController extends Controller
                 return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
             }
             $order->status          = Order::EN_PROCESO;
-            $orden->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
-            $orden->payment_id      = $infoMap['payment_id'];
-            $orden->info_mp         = json_encode($infoMap);
+            $order->payment_type    = $this->convertirTipoPago($infoMap['payment_type']);
+            $order->payment_id      = $infoMap['payment_id'];
+            $order->info_mp         = json_encode($infoMap);
             $order->save();
             return Response()->json(['success' => true]);
         } catch (Exception $error) {
@@ -120,7 +122,7 @@ class MercadoPagoController extends Controller
 
 
 
-    public function notify()
+    /* public function notify()
     {
 
         $datos = request()->all();
@@ -155,7 +157,7 @@ class MercadoPagoController extends Controller
             $jsonInfoMP->status            = 'approved';
 
             $orden->status                  = Order::PAGADO;
-            $order->payment_date            = date('Y-m-d H:i:s');
+            $orden->payment_date            = date('Y-m-d H:i:s');
             $orden->info_mp                 = json_encode($jsonInfoMP);
             $orden->save();
 
@@ -186,7 +188,7 @@ class MercadoPagoController extends Controller
                 'error' => $e
             ]);
         }
-    }
+    } */
 
 
     static function convertirTipoPago($tipoPago)
