@@ -7,8 +7,6 @@ use Exception;
 use Illuminate\Http\Request;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Resources\Payment;
-use MercadoPago\Resources\Payment\Payer;
 
 class MercadoPagoController extends Controller
 {
@@ -18,8 +16,6 @@ class MercadoPagoController extends Controller
         $transaction = $request->transaction;
 
         if ($transaction) {
-            MercadoPagoConfig::setAccessToken("YOUR_ACCESS_TOKEN");
-
             $client = new PaymentClient();
             /* $request_options = new MPRequestOptions();
             $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]); */
