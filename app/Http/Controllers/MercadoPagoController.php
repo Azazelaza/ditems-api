@@ -15,12 +15,9 @@ use MercadoPago\SDK;
 
 class MercadoPagoController extends Controller
 {
-    //USERID 1395469848
-    //NUM APP 4448855768717681
-    //public-key TEST-9f69ef54-f8aa-4ca2-b12d-dd823f1766ff
     function create(Request $request)
     {
-        SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
+        SDK::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->transaction;
 
         if ($transaction) {
@@ -44,7 +41,7 @@ class MercadoPagoController extends Controller
         $order = Order::create([
             'address_shipping' => json_encode($request->address),
             'products' => json_encode($request->product),
-            'price' => $request->product['product']['price'],
+            'price' => floatval($request->product['product']['price']) + 150,
             'status' => Order::CAPTURA,
             'user_id' => $request->user()->id,
             'payment_date' => date('Y-m-d H:i:s'),
