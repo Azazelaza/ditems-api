@@ -5,34 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Exception;
 use Illuminate\Http\Request;
-use MercadoPago\Payer;
-use MercadoPago\Payment;
-use MercadoPago\SDK;
+use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Resources\Payment;
+use MercadoPago\Resources\Payment\Payer;
 
 class MercadoPagoController extends Controller
 {
     function create(Request $request)
     {
-        require_once 'vendor/autoload.php';
-        \MercadoPago\SDK::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
+        MercadoPagoConfig::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->transaction;
 
         if ($transaction) {
-            $payment = new Payment();
-            $payment->transaction_amount = $transaction['transaction_amount'];
-            $payment->token = $transaction['token'];
-            $payment->installments = $transaction['installments'];
-            $payment->payment_method_id = $transaction['payment_method_id'];
-            $payment->issuer_id = $transaction['issuer_id'];
-            $payer = new Payer();
-            $payer->email = $transaction['payer']['email'];
-            $payment->payer = $payer;
-            $payment->save();
-            $response = array(
-                'status' => $payment->status,
-                'status_detail' => $payment->status_detail,
-                'id' => $payment->id
-            );
+            MercadoPagoConfig::setAccessToken("YOUR_ACCESS_TOKEN");
+
+            $client = new PaymentClient();
+            /* $request_options = new MPRequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]); */
+
+            $payment = $client->create([
+                "transaction_amount" => (float) $_POST['transactionAmount'],
+                "token" => $_POST['token'],
+                "installments" => $_POST['installments'],
+                "payment_method_id" => $_POST['paymentMethodId'],
+                "issuer_id" => $_POST['issuer'],
+                "payer" => [
+                    "email" => $_POST['email'],
+                ]
+            ]);
         }
 
         $order = Order::create([
@@ -46,7 +47,7 @@ class MercadoPagoController extends Controller
             'info_mp' => json_encode($payment),
         ]);
 
-        return Response()->json(['success' => true, 'data' => $order, 'payment' => [$response, $payment]]);
+        return Response()->json(['success' => true, 'data' => $order, 'payment' => $payment]);
     }
 
     function complete(Request $request)
