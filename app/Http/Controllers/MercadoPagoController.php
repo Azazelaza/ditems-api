@@ -44,7 +44,7 @@ class MercadoPagoController extends Controller
         $order = Order::create([
             'address_shipping' => json_encode($request->address),
             'products' => json_encode($request->product),
-            'price' => $request->product['price'],
+            'price' => $request->product['product']['price'],
             'status' => Order::CAPTURA,
             'user_id' => $request->user()->id,
             'payment_date' => date('l')
