@@ -14,7 +14,7 @@ class MercadoPagoController extends Controller
     function create(Request $request)
     {
         require_once 'vendor/autoload.php';
-        SDK::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
+        \MercadoPago\SDK::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->transaction;
 
         if ($transaction) {
