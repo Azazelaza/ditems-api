@@ -21,15 +21,15 @@ class MercadoPagoController extends Controller
         SDK::setAccessToken('TEST-4448855768717681-060914-eb532ab893d72ec38890ab9ec1a97133-1395469848');
         $transaction = $request->transaction;
 
-        if ($request->transaction) {
+        if ($transaction) {
             $payment = new Payment();
-            $payment->transaction_amount = $transaction->transaction_amount;
-            $payment->token = $transaction->token;
-            $payment->installments = $transaction->installments;
-            $payment->payment_method_id = $transaction->payment_method_id;
-            $payment->issuer_id = $transaction->issuer_id;
+            $payment->transaction_amount = $transaction['transaction_amount'];
+            $payment->token = $transaction['token'];
+            $payment->installments = $transaction['installments'];
+            $payment->payment_method_id = $transaction['payment_method_id'];
+            $payment->issuer_id = $transaction['issuer_id'];
             $payer = new Payer();
-            $payer->email = $transaction->payer['email'];
+            $payer->email = $transaction->['payer']['email'];
             $payment->payer = $payer;
             $payment->save();
             $response = array(
@@ -39,7 +39,14 @@ class MercadoPagoController extends Controller
             );
         }
 
-        $order = Order::create($request->order);
+        $order = Order::create([
+            'address_shipping' => json_encode($request->address),
+        'products' => json_encode($request->product),
+        'price' => $request->product['price'],
+        'status' => Order::CAPTURA,
+        'user_id' => $request->user()->id,
+        'payment_date' => date('l')
+        ]);
 
         return Response()->json(['success' => true, 'data' => $order ,'payment' => $response]);
     }
