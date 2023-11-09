@@ -25,13 +25,13 @@ class MercadoPagoController extends Controller
             $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]); */
 
             $payment = $client->create([
-                "transaction_amount" => (float) $_POST['transactionAmount'],
-                "token" => $_POST['token'],
-                "installments" => $_POST['installments'],
-                "payment_method_id" => $_POST['paymentMethodId'],
-                "issuer_id" => $_POST['issuer'],
+                "transaction_amount" => (float) $transaction['transactionAmount'],
+                "token" => $transaction['token'],
+                "installments" => $transaction['installments'],
+                "payment_method_id" => $transaction['paymentMethodId'],
+                "issuer_id" => $transaction['issuer'],
                 "payer" => [
-                    "email" => $_POST['email'],
+                    "email" => $transaction['email'],
                 ]
             ]);
         }
