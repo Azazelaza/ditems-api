@@ -20,6 +20,7 @@ class Order extends Model
         'price',
         'status',
         'user_id',
+        'payment_type',
         'payment_date',
         'cancel_date',
     ];
