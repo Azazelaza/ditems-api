@@ -21,6 +21,7 @@ class Order extends Model
         'status',
         'user_id',
         'payment_type',
+        'info_mp',
         'payment_date',
         'cancel_date',
     ];

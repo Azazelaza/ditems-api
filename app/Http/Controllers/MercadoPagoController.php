@@ -48,7 +48,8 @@ class MercadoPagoController extends Controller
             'status' => Order::CAPTURA,
             'user_id' => $request->user()->id,
             'payment_date' => date('Y-m-d H:i:s'),
-            'payment_type' => "Mercado pago"
+            'payment_type' => "Mercado pago",
+            'info_mp' => $response,
         ]);
 
         return Response()->json(['success' => true, 'data' => $order, 'payment' => $response]);
