@@ -42,6 +42,7 @@ Route::get('product/{id}', [ProductController::class, 'show']);
 Route::get('/states', [StateController::class, 'showAll']);
 Route::get('/cfdi', [InvoicesController::class, 'showCfdi']);
 Route::apiResource('/order', OrderController::class);
+Route::apiResource('/invoice', InvoicesController::class);
 
 Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
     Route::prefix('userAdmin')->group(function () {

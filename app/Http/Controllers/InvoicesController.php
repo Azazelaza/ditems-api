@@ -19,10 +19,6 @@ class InvoicesController extends Controller
     public function index(Request $request)
     {
         try {
-            if ($this->validateAdmin()) {
-                return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
-            };
-
             $invoice = Invoice::paginate(15);
             return Response()->json(['success' => true, 'data' => $invoice]);
         } catch (Exception $error) {
