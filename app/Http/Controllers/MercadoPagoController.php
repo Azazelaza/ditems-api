@@ -16,7 +16,6 @@ class MercadoPagoController extends Controller
     {
         MercadoPagoConfig::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->all();
-        dd($transaction);
 
         if ($transaction) {
             $client = new PaymentClient();
