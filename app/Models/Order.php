@@ -48,6 +48,6 @@ class Order extends Model
 
     public function getStateAttribute()
     {
-        return State::find($this->address_shipping->state_id);
+        return State::find($this->address_shipping->state_id)->toArray();
     }
 }
