@@ -35,6 +35,10 @@ class Invoice extends Model
         'status_name'
     ];
 
+    protected $with = [
+        'cfdis'
+    ];
+
     function getStatusNameAttribute()
     {
         switch ($this->status) {
@@ -53,6 +57,11 @@ class Invoice extends Model
             default:
                 return $this->status;
         }
+    }
+
+    public function cfdis()
+    {
+        return $this->hasOne(CfdiKeys::class, 'id', 'cfdi');
     }
 
     public function order()
