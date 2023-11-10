@@ -36,7 +36,7 @@ class MercadoPagoController extends Controller
 
         /* Mail::to($transaction['payer']['email'])->send('Se realizo tu compra'); */
 
-        /* $order = Order::create([
+        $order = Order::create([
             'address_shipping' => json_encode($request->address),
             'products' => json_encode($request->product),
             'price' => floatval($request->product['product']['price']) + 150,
@@ -45,9 +45,9 @@ class MercadoPagoController extends Controller
             'payment_date' => date('Y-m-d H:i:s'),
             'payment_type' => "Mercado pago",
             'info_mp' => json_encode($payment),
-        ]); */
+        ]);
 
-        return Response()->json(['success' => true,/*  'data' => $order, */ 'payment' => $payment]);
+        return Response()->json(['success' => true, 'data' => $order, 'payment' => $payment]);
     }
 
     function complete(Request $request)
