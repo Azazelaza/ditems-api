@@ -31,7 +31,11 @@ class Invoice extends Model
         'address_invoice' => 'json',
     ];
 
-    public function getStatusAttribute()
+    protected $appends = [
+        'status_name'
+    ];
+
+    function getStatusNameAttribute()
     {
         switch ($this->status) {
             case self::RECEIVED:
