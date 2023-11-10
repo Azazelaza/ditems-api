@@ -17,6 +17,7 @@ class Invoice extends Model
         'address_invoice',
         'rfc',
         'cfdi',
+        'tax_certificate',
         'status',
         'order_id',
         'user_id',

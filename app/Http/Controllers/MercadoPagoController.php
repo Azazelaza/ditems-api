@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AddressInvoice;
+use App\Models\Invoice;
 use App\Models\Order;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,7 +35,6 @@ class MercadoPagoController extends Controller
                 ]
             ], $request_options);
         }
-
         /* Mail::to($transaction['payer']['email'])->send('Se realizo tu compra'); */
 
         $order = Order::create([
@@ -46,6 +47,20 @@ class MercadoPagoController extends Controller
             'payment_type' => "Mercado pago",
             'info_mp' => json_encode($payment),
         ]);
+
+        if ($request->has('billing')) {
+            $billing = AddressInvoice::where('user_id', $request->user()->id)->get();
+
+            Invoice::create([
+                'address_invoice' => json_encode($billing),
+                'rfc' => $billing->rfc,
+                'cfdi' => $request->cfdi,
+                'status' => Invoice::CARGADA,
+                'tax_certificate' => $billing->tax_certificate,
+                'order_id' => $order->id,
+                'user_id' => $request->user()->id,
+            ]);
+        }
 
         return Response()->json(['success' => true, 'data' => $order, 'payment' => $payment]);
     }

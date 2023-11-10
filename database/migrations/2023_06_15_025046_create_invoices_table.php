@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('rfc');
             $table->string('cfdi');
             $table->string('tax_certificate')->nullable();
-            $table->string('name_tax_certificate')->nullable();
             $table->integer('status');
             $table->foreignId('order_id');
             $table->foreignId('user_id');
