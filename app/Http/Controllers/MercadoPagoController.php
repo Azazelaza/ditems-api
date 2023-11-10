@@ -20,7 +20,7 @@ class MercadoPagoController extends Controller
         if ($transaction) {
             $client = new PaymentClient();
             $request_options = new RequestOptions();
-            $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
+            $request_options->setCustomHeaders(["X-Idempotency-Key: 547189573289524375894789"]);
 
             $payment = $client->create([
                 "transaction_amount" => (float) $transaction['transaction_amount'],
