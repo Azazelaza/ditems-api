@@ -26,6 +26,13 @@ class Order extends Model
         'cancel_date',
     ];
 
+    protected $casts = [
+        'address_shipping' => 'json',
+        'products' => 'json',
+        'info_mp' => 'json',
+    ];
+
+
     public $with = [
         'user'
     ];

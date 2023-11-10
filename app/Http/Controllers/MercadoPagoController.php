@@ -38,14 +38,14 @@ class MercadoPagoController extends Controller
         /* Mail::to($transaction['payer']['email'])->send('Se realizo tu compra'); */
 
         $order = Order::create([
-            'address_shipping' => json_encode($request->address),
-            'products' => json_encode($request->product),
+            'address_shipping' => $request->address,
+            'products' => $request->product,
             'price' => floatval($request->product['product']['price']) + 150,
             'status' => Order::CAPTURA,
             'user_id' => $request->user()->id,
             'payment_date' => date('Y-m-d H:i:s'),
             'payment_type' => "Mercado pago",
-            'info_mp' => json_encode($payment),
+            'info_mp' => $payment,
         ]);
 
         if ($request->has('billing')) {
