@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
     use HasFactory;
-    const CAPTURA           = 'Captura';
-    const PENDIENTE_PAGO    = 'Pendiente de pago';
-    const ORDEN_CANCELADA   = 'Orden cancelada';
-    const EN_PROCESO        = 'En Proceso';
-    const PAGADO            = 'Pagada';
+    const RECEIVED          = 'Recibida';
+    const PROCESS           = 'Procesando';
+    const CANCEL            = 'Cancelada';
+    const STANDING            = 'En espera';
+    const COMPLETE          = 'Completada';
+    const SHIP              = 'Enviada';
 
     protected $fillable = [
         'address_shipping',
@@ -36,11 +36,6 @@ class Order extends Model
     public $with = [
         'user'
     ];
-
-    /* public function getCreatedAtAttribute($date)
-    {
-        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i');
-    } */
 
     public function user()
     {

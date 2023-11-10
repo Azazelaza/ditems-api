@@ -29,7 +29,7 @@ class OrderController extends Controller
     function store(Request $request)
     {
         try{
-            $request->merge(['status' => Order::CAPTURA]);
+            $request->merge(['status' => Order::RECEIVED]);
             $order = Order::create($request->all());
             return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
         }catch(Exception $error){
@@ -43,13 +43,7 @@ class OrderController extends Controller
             if (!$order) {
                 return Response()->json(['success' => false, 'message' => 'Orden no encontrada..', 'error' => '']);
             }
-            if ($order->status != Order::CAPTURA) {
-                return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
-            }
-            $order->address_shipping    = $request->address_shipping;
-            $order->products            = $request->products;
-            $order->price               = $request->price;
-            $order->save();
+            $order->update($request->all());
             return Response()->json(['success' => true, 'message' => 'Se actualizó correctamente.']);
         }catch(Exception $error){
             return Response()->json(['success' => false, 'message' => 'Error al actualizar.', 'error' => $error]);
@@ -58,9 +52,6 @@ class OrderController extends Controller
     function destroy(Order $order)
     {
         try{
-            if ($order->status != Order::CAPTURA) {
-                return Response()->json(['success' => false, 'message' => 'Estatus inválido.', 'error' => '']);
-            }
             $order->delete();
             return Response()->json(['success' => true, 'message' => 'Se eliminó correctamente.']);
         }catch(Exception $error){

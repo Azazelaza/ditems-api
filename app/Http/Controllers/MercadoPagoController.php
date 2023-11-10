@@ -41,7 +41,7 @@ class MercadoPagoController extends Controller
             'address_shipping' => $request->address,
             'products' => $request->product,
             'price' => floatval($request->product['product']['price']) + 150,
-            'status' => Order::CAPTURA,
+            'status' => Order::RECEIVED,
             'user_id' => $request->user()->id,
             'payment_date' => date('Y-m-d H:i:s'),
             'payment_type' => "Mercado pago",
@@ -65,7 +65,7 @@ class MercadoPagoController extends Controller
         return Response()->json(['success' => true, 'data' => $order, 'payment' => $payment]);
     }
 
-    function complete(Request $request)
+    /* function complete(Request $request)
     {
         try {
 
@@ -85,10 +85,10 @@ class MercadoPagoController extends Controller
         } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al completar pago.', 'error' => $error]);
         }
-    }
+    } */
 
 
-    function cancelate(Request $request)
+    /* function cancelate(Request $request)
     {
         try {
 
@@ -108,10 +108,10 @@ class MercadoPagoController extends Controller
         } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al cancelar pago.', 'error' => $error]);
         }
-    }
+    } */
 
 
-    function process(Request $request)
+    /* function process(Request $request)
     {
         try {
 
@@ -131,7 +131,7 @@ class MercadoPagoController extends Controller
             return Response()->json(['success' => false, 'message' => 'Error al procesar pago.', 'error' => $error]);
         }
     }
-
+ */
 
 
     /* public function notify()

@@ -70,9 +70,9 @@ class InvoicesController extends Controller
                 return Response()->json(['success' => false, 'message' => 'Factura no encontrada..', 'error' => '']);
             }
             $order = $invoice->order();
-            if (!in_array($order->status, [Order::CAPTURA, Order::PENDIENTE_PAGO])) {
+            /* if (!in_array($order->status, [Order::RECEIVED, Order::PENDIENTE_PAGO])) {
                 return Response()->json(['success' => false, 'message' => 'Estatus de orden inválida.', 'error' => '']);
-            }
+            } */
             $invoice->address_invoice   = $request->address_invoice;
             $invoice->rfc               = $request->rfc;
             $invoice->cfdi              = $request->cfdi;
