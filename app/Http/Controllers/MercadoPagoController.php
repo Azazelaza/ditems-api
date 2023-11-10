@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
 
@@ -14,10 +16,10 @@ class MercadoPagoController extends Controller
     {
         MercadoPagoConfig::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->transaction;
-        $payment = [];
-        /* if ($transaction) {
+
+        if ($transaction) {
             $client = new PaymentClient();
-            $request_options = new MPRequestOptions();
+            $request_options = new RequestOptions();
             $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
             $payment = $client->create([
@@ -29,8 +31,10 @@ class MercadoPagoController extends Controller
                 "payer" => [
                     "email" => $transaction['payer']['email'],
                 ]
-            ]);
-        } */
+            ], $request_options);
+        }
+
+        /* Mail::to($transaction['payer']['email'])->send('Se realizo tu compra'); */
 
         $order = Order::create([
             'address_shipping' => json_encode($request->address),
