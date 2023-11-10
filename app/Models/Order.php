@@ -33,16 +33,14 @@ class Order extends Model
         'info_mp' => 'json',
     ];
 
-
-
     public $with = [
         'user'
     ];
 
-    public function getCreatedAtAttribute($date)
+    /* public function getCreatedAtAttribute($date)
     {
         return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i');
-    }
+    } */
 
     public function user()
     {
