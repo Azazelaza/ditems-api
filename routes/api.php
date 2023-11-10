@@ -41,7 +41,8 @@ Route::post('/uploadImage', [ContentPageController::class, 'uploadImage']);
 Route::get('product/{id}', [ProductController::class, 'show']);
 Route::get('/states', [StateController::class, 'showAll']);
 Route::get('/cfdi', [InvoicesController::class, 'showCfdi']);
- 
+Route::apiResource('/order', OrderController::class);
+
 Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
     Route::prefix('userAdmin')->group(function () {
         Route::apiResource('/admin', AdminController::class);
@@ -62,9 +63,6 @@ Route::group(['middleware' => ['auth:admin', 'scopes:admin']], function () {
         Route::get('/roleforadmin/admin/{id}', [RoleForAdminController::class, 'showByAdmin']);
         Route::get('/roleforadmin/rol/{id}', [RoleForAdminController::class, 'showByRol']);
         Route::get('/invoice/downloadTaxCertificate/{id}', [InvoicesController::class, 'downloadTaxCertificate']);
-        Route::post('/order/sendPending', [OrderController::class, 'sendPending']);
-        Route::post('/order/sendCancel', [OrderController::class, 'sendCancel']);
-        Route::post('/order/sendPaid', [OrderController::class, 'sendPaid']);
         Route::post('/uploadGalleryProduct', [ProductController::class, 'uploadGalleryProduct']);
         Route::post('/destroyGalleryProduct', [ProductController::class, 'destroyGalleryProduct']);
     });
@@ -75,13 +73,12 @@ Route::group(['middleware' => ['auth:user', 'scopes:user']], function () {
     Route::post('user/logout', [AuthUserController::class, 'logout']);
     Route::post('user/resetPassword', [AuthAdminController::class, 'resetPassword']);
     Route::apiResource('/addressInvoice', AddressInvoiceController::class);
-    Route::apiResource('/order', OrderController::class);
     Route::apiResource('/checkout', AddressInvoiceController::class);
     Route::post('/payment', [MercadoPagoController::class, 'create']);
-    Route::get('/finish', [MercadoPagoController::class, 'create']);
-    Route::get('/checkout/complete', [MercadoPagoController::class, 'complete']);
-    Route::get('/checkout/cancelate', [MercadoPagoController::class, 'cancelate']);
-    Route::get('/checkout/process', [MercadoPagoController::class, 'process']);
+
+
+
+
     Route::get('/addressInvoice/user/{id}', [AddressInvoiceController::class, 'showByUser']);
     Route::post('/addressInvoice/uploadTaxCertificate', [AddressInvoiceController::class, 'uploadTaxCertificate']);
     Route::get('/addressInvoice/downloadTaxCertificate/{id}', [AddressInvoiceController::class, 'downloadTaxCertificate']);
