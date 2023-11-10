@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('price');
             $table->string('status');
             $table->string('payment_type');
-            $table->string('info_mp');
+            $table->longText('info_mp');
             $table->foreignId('user_id');
             $table->timestamp('payment_date')->useCurrent()->nullable();
             $table->timestamp('cancel_date')->useCurrent()->nullable();
