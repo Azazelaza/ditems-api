@@ -34,10 +34,7 @@ class Order extends Model
     ];
 
     public $with = [
-        'user'
-    ];
-
-    protected $appends = [
+        'user',
         'state'
     ];
 
@@ -45,9 +42,8 @@ class Order extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
-
-    public function getStateAttribute()
+    public function state()
     {
-        return State::find($this->address_shipping->state_id)->toArray();
+        return $this->hasOne(State::class, 'id', 'address_shipping.state_id');
     }
 }
