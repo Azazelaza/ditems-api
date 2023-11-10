@@ -32,7 +32,8 @@ class Invoice extends Model
     ];
 
     protected $appends = [
-        'status_name'
+        'status_name',
+        'state'
     ];
 
     protected $with = [
@@ -67,5 +68,10 @@ class Invoice extends Model
     public function order()
     {
         return $this->belongsTo(Order::class, 'idOrder', 'order_id');
+    }
+
+    public function getStateAttribute()
+    {
+        return State::where('id', $this->address_invoice['state_id'])->first();
     }
 }
