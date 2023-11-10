@@ -46,7 +46,7 @@ class InvoicesController extends Controller
                 return Response()->json(['success' => false, 'data' => [], 'error' => '', 'message' => 'No autorizado.']);
             };
 
-            $request->merge(['status' => Invoice::SIN_CARGAR]);
+            /* $request->merge(['status' => Invoice::SIN_CARGAR]); */
             $invoice = Invoice::create($request->all());
             return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
         } catch (Exception $error) {

@@ -9,9 +9,12 @@ use App\Models\Order;
 class Invoice extends Model
 {
     use HasFactory;
-    const SIN_CARGAR        = 1;
-    const CARGADA           = 2;
-    const CARGADAYDESCARGADA = 3;
+    const RECEIVED          = 1;
+    const PROCESS           = 3;
+    const CANCEL            = 6;
+    const STANDING            = 4;
+    const COMPLETE          = 5;
+    const SHIP              = 2;
 
     protected $fillable = [
         'address_invoice',
@@ -27,6 +30,26 @@ class Invoice extends Model
     protected $casts = [
         'address_invoice' => 'json',
     ];
+
+    public function getStatusAttribute()
+    {
+        switch ($this->status) {
+            case self::RECEIVED:
+                return 'Recibido';
+            case self::PROCESS:
+                return 'Procesando';
+            case self::CANCEL:
+                return 'Cancelada';
+            case self::STANDING:
+                return 'En espera';
+            case self::COMPLETE:
+                return 'Completada';
+            case self::SHIP:
+                return 'Enviada';
+            default:
+                return $this->status;
+        }
+    }
 
     public function order()
     {

@@ -55,7 +55,7 @@ class MercadoPagoController extends Controller
                 'address_invoice' => json_encode($billing),
                 'rfc' => $billing->rfc,
                 'cfdi' => $request->cfdi,
-                'status' => Invoice::CARGADA,
+                'status' => Invoice::RECEIVED,
                 'tax_certificate' => $billing->tax_certificate,
                 'order_id' => $order->id,
                 'user_id' => $request->user()->id,
