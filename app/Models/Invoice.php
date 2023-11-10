@@ -24,6 +24,10 @@ class Invoice extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'address_invoice' => 'json',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class, 'idOrder', 'order_id');
