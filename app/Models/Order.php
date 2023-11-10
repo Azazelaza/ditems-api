@@ -37,8 +37,17 @@ class Order extends Model
         'user'
     ];
 
+    protected $appends = [
+        'state'
+    ];
+
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function getStateAttribute()
+    {
+        return State::find($this->address_shipping->state_id);
     }
 }
