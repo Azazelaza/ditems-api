@@ -25,4 +25,13 @@ class Order extends Model
         'payment_date',
         'cancel_date',
     ];
+
+    public $with = [
+        'user'
+    ];
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
 }
