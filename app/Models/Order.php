@@ -47,6 +47,6 @@ class Order extends Model
     }
     public function getStateAttribute()
     {
-        return $this->hasOne(State::class, 'id', 1);
+        return $this->hasOne(State::class, 'id', 'address_shipping.state_id');
     }
 }
