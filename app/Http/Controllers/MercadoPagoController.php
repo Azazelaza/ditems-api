@@ -16,6 +16,7 @@ class MercadoPagoController extends Controller
     {
         MercadoPagoConfig::setAccessToken('TEST-189768172833294-091811-4551253209d7f6bf373f3f18b0e4c7e4-349598052');
         $transaction = $request->transaction;
+        dd($transaction);
 
         if ($transaction) {
             $client = new PaymentClient();
@@ -23,7 +24,7 @@ class MercadoPagoController extends Controller
             $request_options->setCustomHeaders(["X-Idempotency-Key: 547189573289524375894789"]);
 
             $payment = $client->create([
-                "transaction_amount" => (float) $transaction['transaction_amount'],
+                "transaction_amount" => 150,
                 "token" => $transaction['token'],
                 "installments" => $transaction['installments'],
                 "payment_method_id" => $transaction['payment_method_id'],
@@ -36,7 +37,7 @@ class MercadoPagoController extends Controller
 
         /* Mail::to($transaction['payer']['email'])->send('Se realizo tu compra'); */
 
-        $order = Order::create([
+        /* $order = Order::create([
             'address_shipping' => json_encode($request->address),
             'products' => json_encode($request->product),
             'price' => floatval($request->product['product']['price']) + 150,
@@ -45,9 +46,9 @@ class MercadoPagoController extends Controller
             'payment_date' => date('Y-m-d H:i:s'),
             'payment_type' => "Mercado pago",
             'info_mp' => json_encode($payment),
-        ]);
+        ]); */
 
-        return Response()->json(['success' => true, 'data' => $order, 'payment' => $payment]);
+        return Response()->json(['success' => true,/*  'data' => $order, */ 'payment' => $payment]);
     }
 
     function complete(Request $request)
