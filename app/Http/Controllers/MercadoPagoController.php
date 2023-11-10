@@ -49,7 +49,7 @@ class MercadoPagoController extends Controller
         ]);
 
         if ($request->has('billing')) {
-            $billing = AddressInvoice::where('user_id', $request->user()->id)->get();
+            $billing = AddressInvoice::where('user_id', $request->user()->id)->first();
 
             Invoice::create([
                 'address_invoice' => json_encode($billing),
