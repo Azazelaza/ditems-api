@@ -47,6 +47,6 @@ class Order extends Model
     }
     public function getStateAttribute()
     {
-        return $this->address_shipping['state_id'];
+        return State::where('id', $this->address_shipping['state_id'])->first();
     }
 }
