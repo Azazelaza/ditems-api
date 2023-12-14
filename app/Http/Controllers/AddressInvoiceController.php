@@ -13,19 +13,19 @@ class AddressInvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        try{
+        try {
             $address = AddressInvoice::paginate(15);
             return Response()->json(['success' => true, 'data' => $address]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
     function show($id)
     {
-        try{
+        try {
             $address = AddressInvoice::find($id);
             return Response()->json(['success' => true, 'data' => $address]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
@@ -35,26 +35,26 @@ class AddressInvoiceController extends Controller
      */
     function showByUser($id)
     {
-        try{
+        try {
             $adresses = AddressInvoice::user($id)->get();
             return Response()->json(['success' => true, 'data' => $adresses]);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
 
     function store(Request $request)
     {
-        try{
-            $address = AddressInvoice::create($request->all());
+        try {
+            $address = AddressInvoice::createOrUpdate(['user_id' => $request->user()->id], $request->all());
             return Response()->json(['success' => true, 'message' => 'Se guardó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al guardar.', 'error' => $error]);
         }
     }
     public function update(Request $request, $idAddressInvoice)
     {
-        try{
+        try {
             $address = AddressInvoice::find($idAddressInvoice);
             if (!$address) {
                 return Response()->json(['success' => false, 'message' => 'Dirección de Factura no encontrada..', 'error' => '']);
@@ -70,16 +70,16 @@ class AddressInvoiceController extends Controller
             $address->city              = $request->city;
             $address->save();
             return Response()->json(['success' => true, 'message' => 'Se actualizó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al actualizar.', 'error' => $error]);
         }
     }
     function destroy(AddressInvoice $address)
     {
-        try{
+        try {
             $address->delete();
             return Response()->json(['success' => true, 'message' => 'Se eliminó correctamente.']);
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'message' => 'Error al eliminar.', 'error' => $error]);
         }
     }
@@ -101,11 +101,10 @@ class AddressInvoiceController extends Controller
      */
     function downloadTaxCertificate($id)
     {
-        try{
+        try {
             $address = AddressInvoice::find($id);
             return Storage::disk('uploadAddressTaxCertificate')->download($address->tax_certificate, $address->name_tax_certificate);
-      
-        }catch(Exception $error){
+        } catch (Exception $error) {
             return Response()->json(['success' => false, 'data' => [], 'error' => $error]);
         }
     }
